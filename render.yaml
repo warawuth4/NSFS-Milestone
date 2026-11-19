@@ -4,7 +4,7 @@ services:
     env: node
     rootDir: backend
     plan: free
-    buildCommand: npm install && npm run prisma:generate && npm run build
+    buildCommand: NODE_OPTIONS="--max-old-space-size=2048" npm install --include=dev --no-audit --no-fund && npm run prisma:generate && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /health
     autoDeploy: true
@@ -13,6 +13,8 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=450"
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL
