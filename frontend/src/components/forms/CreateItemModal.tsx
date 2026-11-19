@@ -17,51 +17,33 @@ interface CreateItemModalProps {
   onCreateCriteria: (data: any) => Promise<void>;
 }
 
-// Topic-Specific Guidelines for Implementing Dashboard for Sleeping Score
+// Topic-Specific Sleeping Score Guidelines for Placeholders
 const sleepScoreGuidelines = {
   epic: {
     titlePlaceholder: 'e.g. Sleep Score Health & Circadian Rhythm Analytics Engine',
-    titleExample: 'Example: "Sleep Quality & Rest Recovery Analytics Dashboard"',
     rolePlaceholder: 'e.g. wellness enthusiast and wearable device user',
-    roleExample: 'Example: "health-conscious user tracking nocturnal sleep recovery"',
     wantPlaceholder: 'e.g. aggregate multi-sensor biometric sleep scores into a unified nocturnal recovery dashboard',
-    wantExample: 'Example: "view my holistic daily sleep score and sleep stage breakdown in a centralized health dashboard"',
     soThatPlaceholder: 'e.g. users gain transparent visibility into deep sleep deficits and recovery readiness trends',
-    soThatExample: 'Example: "I can understand factors disrupting my deep sleep and optimize my nighttime recovery habits"',
     descPlaceholder: 'e.g. Integrates optical heart rate sensor logs, sleep debt metrics, and circadian rhythm models.',
-    descExample: 'Example: "Consolidates biometric sleep duration, sleep efficiency percentages, and circadian rhythm trends"',
   },
   story: {
     titlePlaceholder: 'e.g. Nocturnal Sleep Stage Hypnogram & Restorative Score Gauge',
-    titleExample: 'Example: "Sleep Stage Breakdown & REM Progression Chart"',
     rolePlaceholder: 'e.g. insomnia patient tracking sleep hygiene',
-    roleExample: 'Example: "active athlete monitoring post-workout sleep recovery score"',
     wantPlaceholder: 'e.g. visualize the ratio of REM, deep, and light sleep compared to clinical benchmarks',
-    wantExample: 'Example: "see an interactive hypnogram graph comparing my deep sleep cycles against clinical recommendations"',
     soThatPlaceholder: 'e.g. I can identify wakefulness interruptions and discuss actionable trends with my sleep physician',
-    soThatExample: 'Example: "I can isolate nocturnal waking triggers that degrade my morning sleep readiness index"',
     descPlaceholder: 'e.g. Renders time-series hypnogram bar charts and calculates deep sleep target thresholds.',
-    descExample: 'Example: "Implements color-coded sleep architecture timeline with micro-arousal indicators"',
   },
   task: {
     titlePlaceholder: 'e.g. Calculate Sleep Score Algorithm from Heart Rate Variability & Restless Episodes',
-    titleExample: 'Example: "Compute Weighted 0-100 Sleep Score from Biometric Heart Rate & Tossing Frequency"',
     rolePlaceholder: 'e.g. health data engineer',
-    roleExample: 'Example: "biometric algorithm developer"',
     wantPlaceholder: 'e.g. compute weighted 0-100 sleep scores combining total sleep time, heart rate variability, and tossing frequency',
-    wantExample: 'Example: "implement 0-100 sleep score formula weighting sleep duration (40%), deep sleep (30%), and HRV (30%)"',
     soThatPlaceholder: 'e.g. the frontend dashboard renders accurate score gauges within 200 milliseconds of device sync',
-    soThatExample: 'Example: "the sleep score gauge updates instantly upon morning wearable sync with 2-click status changing"',
     descPlaceholder: 'e.g. Normalize sensor inputs into standardized restorative sleep index with 2-click status updates.',
-    descExample: 'Example: "Calibrate baseline resting heart rate dip and factor awake minutes into the final score"',
   },
   criteria: {
     givenPlaceholder: 'e.g. a user connects their sleep tracking wearable with 7 hours of logged nocturnal data',
-    givenExample: 'Example: "Given an authenticated user has synchronized 420 minutes of nocturnal wearable sleep logs"',
     whenPlaceholder: 'e.g. the sleep score computation finishes analyzing deep sleep duration and awake minutes',
-    whenExample: 'Example: "When the calculation engine completes analyzing deep sleep duration, awake minutes, and heart rate dip"',
     thenPlaceholder: 'e.g. the dashboard displays an overall sleep score between 0 and 100 with color-coded restorative tier badges',
-    thenExample: 'Example: "Then the sleeping score dashboard renders a circular score gauge between 0 and 100 with restorative tier categorization"',
   },
 };
 
@@ -247,7 +229,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
             </div>
           )}
 
-          {/* Title Field with topic-specific sleeping score guidelines in gray text */}
+          {/* Title Field with topic-specific sleeping score placeholder */}
           {itemType !== 'criteria' && (
             <div className="space-y-1">
               <label htmlFor="item-title" className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
@@ -262,9 +244,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                 placeholder={currentGuideline.titlePlaceholder}
                 className="w-full text-xs px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                {currentGuideline.titleExample}
-              </p>
             </div>
           )}
 
@@ -289,9 +268,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={currentGuideline.rolePlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {currentGuideline.roleExample}
-                </p>
               </div>
 
               {/* Box 2: I want to [goal] */}
@@ -307,9 +283,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={currentGuideline.wantPlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {currentGuideline.wantExample}
-                </p>
               </div>
 
               {/* Box 3: so that [benefit] */}
@@ -325,8 +298,35 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={currentGuideline.soThatPlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {currentGuideline.soThatExample}
+              </div>
+
+              {/* Complete Concatenated Sentence at the bottom of User Story Template section */}
+              <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-700/80">
+                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                  Complete User Story Sentence
+                </div>
+                <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-relaxed bg-white dark:bg-slate-900 p-2.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-2xs">
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">As a</span>{' '}
+                  {role.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {currentGuideline.rolePlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {', '}
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">I want to</span>{' '}
+                  {want.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {currentGuideline.wantPlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {', '}
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">so that</span>{' '}
+                  {soThat.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {currentGuideline.soThatPlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {'.'}
                 </p>
               </div>
             </div>
@@ -367,9 +367,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={criteriaGuideline.givenPlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {criteriaGuideline.givenExample}
-                </p>
               </div>
 
               {/* When Box */}
@@ -386,9 +383,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={criteriaGuideline.whenPlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {criteriaGuideline.whenExample}
-                </p>
               </div>
 
               {/* Then Box */}
@@ -405,8 +399,35 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   placeholder={criteriaGuideline.thenPlaceholder}
                   className="w-full text-xs px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-md text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  {criteriaGuideline.thenExample}
+              </div>
+
+              {/* Complete Concatenated Sentence at the bottom of Acceptance Criteria section */}
+              <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-700/80">
+                <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                  Complete Acceptance Criteria Sentence
+                </div>
+                <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-relaxed bg-white dark:bg-slate-900 p-2.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-2xs">
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">Given</span>{' '}
+                  {given.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {criteriaGuideline.givenPlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {', '}
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">When</span>{' '}
+                  {when.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {criteriaGuideline.whenPlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {', '}
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">Then</span>{' '}
+                  {then.trim() || (
+                    <span className="text-slate-400 dark:text-slate-500 italic font-normal">
+                      {criteriaGuideline.thenPlaceholder.replace('e.g. ', '')}
+                    </span>
+                  )}
+                  {'.'}
                 </p>
               </div>
             </div>
@@ -431,9 +452,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  Example: &ldquo;Sleep Score Health & Circadian Rhythm Analytics&rdquo;
-                </p>
               </div>
             )}
 
@@ -454,9 +472,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  Example: &ldquo;Nocturnal Sleep Stage Hypnogram & Restorative Score Gauge&rdquo;
-                </p>
               </div>
             )}
 
@@ -478,9 +493,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  Example: &ldquo;Sprint 1 - Sleep Score Algorithm & Hypnogram&rdquo;
-                </p>
               </div>
             )}
 
@@ -500,9 +512,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   <option value="HIGH">High</option>
                   <option value="CRITICAL">Critical</option>
                 </select>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  Example: &ldquo;High priority sleep score feature&rdquo;
-                </p>
               </div>
             )}
 
@@ -522,9 +531,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   <option value="IN_REVIEW">In Review</option>
                   <option value="DONE">Done</option>
                 </select>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                  Example: &ldquo;TODO (can transition in 2 clicks on dashboard)&rdquo;
-                </p>
               </div>
             )}
           </div>
@@ -543,9 +549,6 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                 placeholder={currentGuideline.descPlaceholder}
                 className="w-full text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-                {currentGuideline.descExample}
-              </p>
             </div>
           )}
 

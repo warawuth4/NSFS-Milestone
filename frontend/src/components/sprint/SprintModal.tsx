@@ -139,9 +139,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
               placeholder="e.g. Sprint 1 - Biometric Ingestion & Restorative Sleep Score Engine"
               className="w-full text-xs px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-              Example: &ldquo;Sprint 1 - Sleep Stage Hypnogram & Restorative Score Engine&rdquo;
-            </p>
           </div>
 
           {/* Sprint Goal Box with gray sleeping score example text */}
@@ -157,9 +154,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
               placeholder="e.g. Ingest wearable nocturnal time-series and compute weighted 0-100 sleeping score with 2-click status updates."
               className="w-full text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-              Example: &ldquo;Deliver real-time sleep score calculation engine and 2-click milestone status transitions&rdquo;
-            </p>
           </div>
 
           {/* Dates & Status Grid */}
@@ -175,7 +169,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 onChange={(e) => setStartDate(e.target.value)}
                 className="w-full text-xs px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;2026-03-01&rdquo;</p>
             </div>
 
             <div className="space-y-1">
@@ -189,7 +182,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 onChange={(e) => setEndDate(e.target.value)}
                 className="w-full text-xs px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;2026-03-14&rdquo;</p>
             </div>
 
             <div className="space-y-1">
@@ -206,7 +198,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 <option value="ACTIVE">Active</option>
                 <option value="COMPLETED">Completed</option>
               </select>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;ACTIVE&rdquo;</p>
             </div>
           </div>
 
@@ -220,9 +211,6 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 {selectedTaskIds.length} tasks selected
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
-              Example: &ldquo;Check tasks to assign nocturnal algorithm and hypnogram tasks into this sprint&rdquo;
-            </p>
 
             <div className="max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-lg p-2 space-y-1 bg-slate-50 dark:bg-slate-800/50">
               {tasks.length === 0 ? (
