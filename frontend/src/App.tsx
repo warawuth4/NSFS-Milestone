@@ -150,6 +150,37 @@ export function App() {
     loadData();
   };
 
+  // Delete Item Handlers
+  const handleDeleteEpic = async (id: string) => {
+    try {
+      await api.epics.delete(id);
+      showToast('Epic and associated stories deleted');
+      loadData();
+    } catch (err) {
+      console.error('Failed to delete epic:', err);
+    }
+  };
+
+  const handleDeleteStory = async (id: string) => {
+    try {
+      await api.stories.delete(id);
+      showToast('Story and associated tasks deleted');
+      loadData();
+    } catch (err) {
+      console.error('Failed to delete story:', err);
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    try {
+      await api.tasks.delete(id);
+      showToast('Task deleted successfully');
+      loadData();
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
+  };
+
   // Sprint Create / Edit Handler
   const handleSaveSprint = async (data: Partial<Sprint>, assignedTaskIds: string[]) => {
     if (sprintToEdit) {
@@ -233,6 +264,7 @@ export function App() {
                   setSprintToEdit(null);
                   setIsSprintModalOpen(true);
                 }}
+                onDeleteTask={handleDeleteTask}
               />
             )}
 
@@ -252,6 +284,7 @@ export function App() {
                 onStatusChange={handleStatusChange}
                 onToggleCriterion={handleToggleCriterion}
                 onAssignSprint={handleAssignSprint}
+                onDeleteTask={handleDeleteTask}
               />
             )}
 
@@ -270,6 +303,9 @@ export function App() {
                   setCreateItemDefaultParentId(parentId);
                   setIsCreateItemModalOpen(true);
                 }}
+                onDeleteEpic={handleDeleteEpic}
+                onDeleteStory={handleDeleteStory}
+                onDeleteTask={handleDeleteTask}
               />
             )}
           </>

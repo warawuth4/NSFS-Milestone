@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { Task, Status, Priority } from '../../types';
-import { CheckCircle2, Clock, ChevronDown, CheckSquare, Square, Tag } from 'lucide-react';
+import { CheckCircle2, Clock, ChevronDown, CheckSquare, Square, Tag, Trash2 } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
   onStatusChange: (taskId: string, newStatus: Status) => void;
   onToggleCriterion?: (criterionId: string) => void;
   onEditTask?: (task: Task) => void;
+  onDeleteTask?: (taskId: string) => void;
   allSprints?: { id: string; name: string }[];
   onAssignSprint?: (taskId: string, sprintId: string) => void;
 }
@@ -57,6 +58,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onStatusChange,
   onToggleCriterion,
   onEditTask,
+  onDeleteTask,
   allSprints = [],
   onAssignSprint,
 }) => {
@@ -84,7 +86,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all space-y-3"
       aria-label={`Task: ${task.title}`}
     >
-      {/* Header: Title and 2-Click Status Changer */}
+      {/* Header: Title, 2-Click Status Changer, and Delete Button */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -110,61 +112,80 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </h3>
         </div>
 
-        {/* 2-Click Task Progress Controller (Requirement 7 & 8) */}
-        <div className="relative" ref={menuRef}>
-          {/* Click 1: Click the status badge to open the menu */}
-          <button
-            type="button"
-            onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-400 ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border} hover:opacity-90`}
-            aria-expanded={isStatusMenuOpen}
-            aria-haspopup="true"
-            aria-label={`Task status: ${currentStatus.label}. Click 1 to open status choices.`}
-            title="Click to change progress status (2 clicks)"
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${currentStatus.dot}`} aria-hidden="true" />
-            <span>{currentStatus.label}</span>
-            <ChevronDown className="w-3 h-3 opacity-60" aria-hidden="true" />
-          </button>
-
-          {/* Click 2: Click the target status from dropdown */}
-          {isStatusMenuOpen && (
-            <div
-              className="absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-xl z-20 py-1"
-              role="menu"
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* 2-Click Task Progress Controller (Requirement 7 & 8) */}
+          <div className="relative" ref={menuRef}>
+            {/* Click 1: Click the status badge to open the menu */}
+            <button
+              type="button"
+              onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-400 ${currentStatus.bg} ${currentStatus.text} ${currentStatus.border} hover:opacity-90`}
+              aria-expanded={isStatusMenuOpen}
+              aria-haspopup="true"
+              aria-label={`Task status: ${currentStatus.label}. Click 1 to open status choices.`}
+              title="Click to change progress status (2 clicks)"
             >
-              <div className="px-2 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                Select Status (Click 2)
+              <span className={`w-1.5 h-1.5 rounded-full ${currentStatus.dot}`} aria-hidden="true" />
+              <span>{currentStatus.label}</span>
+              <ChevronDown className="w-3 h-3 opacity-60" aria-hidden="true" />
+            </button>
+
+            {/* Click 2: Click the target status from dropdown */}
+            {isStatusMenuOpen && (
+              <div
+                className="absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-xl z-20 py-1"
+                role="menu"
+              >
+                <div className="px-2 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Select Status (Click 2)
+                </div>
+                {statuses.map((status) => {
+                  const conf = statusConfig[status];
+                  const isSelected = task.status === status;
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => {
+                        onStatusChange(task.id, status);
+                        setIsStatusMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                        isSelected
+                          ? 'font-semibold text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80'
+                          : 'text-slate-700 dark:text-slate-300'
+                      }`}
+                      role="menuitem"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${conf.dot}`} aria-hidden="true" />
+                        {conf.label}
+                      </span>
+                      {isSelected && (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-              {statuses.map((status) => {
-                const conf = statusConfig[status];
-                const isSelected = task.status === status;
-                return (
-                  <button
-                    key={status}
-                    type="button"
-                    onClick={() => {
-                      onStatusChange(task.id, status);
-                      setIsStatusMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
-                      isSelected
-                        ? 'font-semibold text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80'
-                        : 'text-slate-700 dark:text-slate-300'
-                    }`}
-                    role="menuitem"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${conf.dot}`} aria-hidden="true" />
-                      {conf.label}
-                    </span>
-                    {isSelected && (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            )}
+          </div>
+
+          {/* Delete Task Button */}
+          {onDeleteTask && (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Delete task "${task.title}"?`)) {
+                  onDeleteTask(task.id);
+                }
+              }}
+              className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+              title={`Delete task "${task.title}"`}
+              aria-label={`Delete task ${task.title}`}
+            >
+              <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
           )}
         </div>
       </div>

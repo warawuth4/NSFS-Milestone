@@ -11,6 +11,7 @@ interface SprintsViewProps {
   onStatusChange: (taskId: string, newStatus: Status) => void;
   onToggleCriterion?: (criterionId: string) => void;
   onAssignSprint: (taskId: string, sprintId: string) => void;
+  onDeleteTask?: (taskId: string) => void;
 }
 
 export const SprintsView: React.FC<SprintsViewProps> = ({
@@ -21,6 +22,7 @@ export const SprintsView: React.FC<SprintsViewProps> = ({
   onStatusChange,
   onToggleCriterion,
   onAssignSprint,
+  onDeleteTask,
 }) => {
   return (
     <div className="space-y-6">
@@ -142,6 +144,7 @@ export const SprintsView: React.FC<SprintsViewProps> = ({
                           onToggleCriterion={onToggleCriterion}
                           allSprints={sprints}
                           onAssignSprint={onAssignSprint}
+                          onDeleteTask={onDeleteTask}
                         />
                       ))}
                     </div>

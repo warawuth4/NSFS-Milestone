@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Epic, Story, Task, Status } from '../../types';
-import { Layers } from 'lucide-react';
+import { Layers, Trash2 } from 'lucide-react';
 import { TaskCard } from '../milestone/TaskCard';
 
 interface BacklogViewProps {
@@ -12,6 +12,9 @@ interface BacklogViewProps {
   onToggleCriterion?: (criterionId: string) => void;
   onAssignSprint: (taskId: string, sprintId: string) => void;
   onOpenCreateItem: (type?: 'epic' | 'story' | 'task' | 'criteria', parentId?: string) => void;
+  onDeleteEpic?: (epicId: string) => void;
+  onDeleteStory?: (storyId: string) => void;
+  onDeleteTask?: (taskId: string) => void;
 }
 
 export const BacklogView: React.FC<BacklogViewProps> = ({
@@ -23,6 +26,9 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
   onToggleCriterion,
   onAssignSprint,
   onOpenCreateItem,
+  onDeleteEpic,
+  onDeleteStory,
+  onDeleteTask,
 }) => {
   return (
     <div className="space-y-6">
@@ -89,13 +95,30 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                         {epic.status}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => onOpenCreateItem('story', epic.id)}
-                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-                    >
-                      + Add Story to Epic
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onOpenCreateItem('story', epic.id)}
+                        className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                      >
+                        + Add Story to Epic
+                      </button>
+                      {onDeleteEpic && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`Delete epic "${epic.title}" and all its linked stories and tasks?`)) {
+                              onDeleteEpic(epic.id);
+                            }
+                          }}
+                          className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                          title={`Delete epic "${epic.title}"`}
+                          aria-label={`Delete epic ${epic.title}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{epic.title}</h2>
 
@@ -159,13 +182,30 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                               )}
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => onOpenCreateItem('task', story.id)}
-                              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-                            >
-                              + Add Task
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => onOpenCreateItem('task', story.id)}
+                                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                              >
+                                + Add Task
+                              </button>
+                              {onDeleteStory && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (window.confirm(`Delete story "${story.title}" and all its tasks?`)) {
+                                      onDeleteStory(story.id);
+                                    }
+                                  }}
+                                  className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                                  title={`Delete story "${story.title}"`}
+                                  aria-label={`Delete story ${story.title}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                                </button>
+                              )}
+                            </div>
                           </div>
 
                           {/* Story Tasks */}
@@ -179,6 +219,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                                   onToggleCriterion={onToggleCriterion}
                                   allSprints={sprints}
                                   onAssignSprint={onAssignSprint}
+                                  onDeleteTask={onDeleteTask}
                                 />
                               ))}
                             </div>

@@ -508,6 +508,34 @@ function handleMockRequest<T>(path: string, options: RequestInit = {}): T {
     }
   }
 
+  // DELETE EPICS
+  if (path.startsWith('/epics/') && method === 'DELETE') {
+    const id = path.split('/')[2];
+    mockEpics = mockEpics.filter((e) => e.id !== id);
+    const storyIdsToRemove = mockStories.filter((s) => s.epicId === id).map((s) => s.id);
+    mockStories = mockStories.filter((s) => s.epicId !== id);
+    mockTasks = mockTasks.filter((t) => !storyIdsToRemove.includes(t.storyId || ''));
+    recalculateMockProgress();
+    return { success: true } as unknown as T;
+  }
+
+  // DELETE STORIES
+  if (path.startsWith('/stories/') && method === 'DELETE') {
+    const id = path.split('/')[2];
+    mockStories = mockStories.filter((s) => s.id !== id);
+    mockTasks = mockTasks.filter((t) => t.storyId !== id);
+    recalculateMockProgress();
+    return { success: true } as unknown as T;
+  }
+
+  // DELETE TASKS
+  if (path.startsWith('/tasks/') && method === 'DELETE') {
+    const id = path.split('/')[2];
+    mockTasks = mockTasks.filter((t) => t.id !== id);
+    recalculateMockProgress();
+    return { success: true } as unknown as T;
+  }
+
   return {} as unknown as T;
 }
 

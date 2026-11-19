@@ -17,6 +17,7 @@ interface MilestoneOverviewProps {
   onAssignSprint: (taskId: string, sprintId: string) => void;
   onOpenCreateItem: (type?: 'epic' | 'story' | 'task' | 'criteria') => void;
   onOpenCreateSprint: () => void;
+  onDeleteTask?: (taskId: string) => void;
 }
 
 export const MilestoneOverview: React.FC<MilestoneOverviewProps> = ({
@@ -28,6 +29,7 @@ export const MilestoneOverview: React.FC<MilestoneOverviewProps> = ({
   onAssignSprint,
   onOpenCreateItem,
   onOpenCreateSprint,
+  onDeleteTask,
 }) => {
   const [selectedSprintId, setSelectedSprintId] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -281,6 +283,7 @@ export const MilestoneOverview: React.FC<MilestoneOverviewProps> = ({
                         onToggleCriterion={onToggleCriterion}
                         allSprints={sprints}
                         onAssignSprint={onAssignSprint}
+                        onDeleteTask={onDeleteTask}
                       />
                     ))
                   )}
