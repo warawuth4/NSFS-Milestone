@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Sprint, Task, SprintStatus } from '../../types';
-import { X, Calendar, CheckSquare, Square } from 'lucide-react';
+import type { Sprint, Task, SprintStatus } from '../../types';
+import { X, CheckSquare, Square } from 'lucide-react';
 
 interface SprintModalProps {
   isOpen: boolean;
@@ -91,26 +91,26 @@ export const SprintModal: React.FC<SprintModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="sprint-modal-title"
     >
-      <div className="bg-white rounded-xl max-w-xl w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white dark:bg-slate-900 rounded-xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/70">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90">
           <div>
-            <h2 id="sprint-modal-title" className="text-base font-bold text-slate-900">
-              {sprintToEdit ? 'Edit Sprint' : 'Create New Sprint'}
+            <h2 id="sprint-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+              {sprintToEdit ? 'Edit Sleep Score Sprint' : 'Create Sleep Score Sprint'}
             </h2>
-            <p className="text-xs text-slate-500">
-              Manage sprint cycle, duration, and allocate tasks into sprint
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Plan sprint iterations for biometric sleep score ingestion, hypnograms, and score gauge widgets
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1 rounded-md transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-md transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" aria-hidden="true" />
@@ -118,16 +118,16 @@ export const SprintModal: React.FC<SprintModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
           {error && (
-            <div className="p-3 text-xs bg-rose-50 border border-rose-200 text-rose-700 rounded-md">
+            <div className="p-3 text-xs bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 rounded-md">
               {error}
             </div>
           )}
 
-          {/* Sprint Name Box with gray example sentence (Requirement 3) */}
+          {/* Sprint Name Box with gray sleeping score example text */}
           <div className="space-y-1">
-            <label htmlFor="sprint-name" className="block text-xs font-semibold text-slate-800">
+            <label htmlFor="sprint-name" className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
               Sprint Name <span className="text-rose-500">*</span>
             </label>
             <input
@@ -136,18 +136,17 @@ export const SprintModal: React.FC<SprintModalProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Sprint 1 - Authentication & Core Workflow"
-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded-md shadow-2xs focus:ring-2 focus:ring-indigo-500 focus:outline-none placeholder:text-slate-400 text-slate-900"
+              placeholder="e.g. Sprint 1 - Biometric Ingestion & Restorative Sleep Score Engine"
+              className="w-full text-xs px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
-            {/* Requirement 3: Example sentence in gray text */}
-            <p className="text-[11px] text-slate-400 italic">
-              Example: &ldquo;Sprint 1 - Authentication & Project Shell&rdquo;
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+              Example: &ldquo;Sprint 1 - Sleep Stage Hypnogram & Restorative Score Engine&rdquo;
             </p>
           </div>
 
-          {/* Sprint Goal Box with gray example sentence (Requirement 3) */}
+          {/* Sprint Goal Box with gray sleeping score example text */}
           <div className="space-y-1">
-            <label htmlFor="sprint-goal" className="block text-xs font-semibold text-slate-800">
+            <label htmlFor="sprint-goal" className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
               Sprint Goal
             </label>
             <textarea
@@ -155,19 +154,18 @@ export const SprintModal: React.FC<SprintModalProps> = ({
               rows={2}
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
-              placeholder="e.g. Deliver milestone overview with 2-click task status progression."
-              className="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-md shadow-2xs focus:ring-2 focus:ring-indigo-500 focus:outline-none placeholder:text-slate-400 text-slate-900"
+              placeholder="e.g. Ingest wearable nocturnal time-series and compute weighted 0-100 sleeping score with 2-click status updates."
+              className="w-full text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
-            {/* Requirement 3: Example sentence in gray text */}
-            <p className="text-[11px] text-slate-400 italic">
-              Example: &ldquo;Deliver landing milestone view and agile creation dialogs&rdquo;
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+              Example: &ldquo;Deliver real-time sleep score calculation engine and 2-click milestone status transitions&rdquo;
             </p>
           </div>
 
           {/* Dates & Status Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label htmlFor="sprint-start" className="block text-xs font-medium text-slate-700">
+              <label htmlFor="sprint-start" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
                 Start Date
               </label>
               <input
@@ -175,13 +173,13 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-md bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 italic">Example: &ldquo;2026-03-01&rdquo;</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;2026-03-01&rdquo;</p>
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="sprint-end" className="block text-xs font-medium text-slate-700">
+              <label htmlFor="sprint-end" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
                 End Date
               </label>
               <input
@@ -189,44 +187,44 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-md bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
-              <p className="text-[11px] text-slate-400 italic">Example: &ldquo;2026-03-14&rdquo;</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;2026-03-14&rdquo;</p>
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="sprint-status" className="block text-xs font-medium text-slate-700">
+              <label htmlFor="sprint-status" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
                 Status
               </label>
               <select
                 id="sprint-status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as SprintStatus)}
-                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-md bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                className="w-full text-xs px-2.5 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               >
                 <option value="PLANNED">Planned</option>
                 <option value="ACTIVE">Active</option>
                 <option value="COMPLETED">Completed</option>
               </select>
-              <p className="text-[11px] text-slate-400 italic">Example: &ldquo;ACTIVE&rdquo;</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">Example: &ldquo;ACTIVE&rdquo;</p>
             </div>
           </div>
 
-          {/* Task Allocation Box (Requirement 6: Put each task into each sprint) */}
-          <div className="space-y-2 pt-2 border-t border-slate-200">
+          {/* Task Allocation Box */}
+          <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-800">
-                Allocate Tasks to this Sprint (Requirement 6)
+              <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
+                Allocate Sleep Tasks to this Sprint (Requirement 6)
               </label>
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
                 {selectedTaskIds.length} tasks selected
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 italic">
-              Example: &ldquo;Check tasks to include them in this sprint backlog&rdquo;
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">
+              Example: &ldquo;Check tasks to assign nocturnal algorithm and hypnogram tasks into this sprint&rdquo;
             </p>
 
-            <div className="max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-2 space-y-1 bg-slate-50">
+            <div className="max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-lg p-2 space-y-1 bg-slate-50 dark:bg-slate-800/50">
               {tasks.length === 0 ? (
                 <p className="text-xs text-slate-400 p-2 text-center">No tasks available yet</p>
               ) : (
@@ -238,13 +236,13 @@ export const SprintModal: React.FC<SprintModalProps> = ({
                       onClick={() => toggleTaskSelection(task.id)}
                       className={`flex items-center justify-between p-2 rounded text-xs cursor-pointer transition-colors ${
                         isChecked
-                          ? 'bg-indigo-50/80 border border-indigo-200 text-indigo-950'
-                          : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60'
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200'
+                          : 'bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-800'
                       }`}
                     >
                       <div className="flex items-center gap-2 overflow-hidden">
                         {isChecked ? (
-                          <CheckSquare className="w-4 h-4 text-indigo-600 shrink-0" aria-hidden="true" />
+                          <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" aria-hidden="true" />
                         ) : (
                           <Square className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
                         )}
@@ -261,11 +259,11 @@ export const SprintModal: React.FC<SprintModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-300 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
+              className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
             >
               Cancel
             </button>

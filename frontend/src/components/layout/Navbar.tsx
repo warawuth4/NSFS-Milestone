@@ -1,11 +1,13 @@
 import React from 'react';
-import { Target, Layers, PlusCircle, Calendar } from 'lucide-react';
+import { Target, Layers, PlusCircle, Calendar, Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
   currentView: 'milestones' | 'sprints' | 'backlog';
   onViewChange: (view: 'milestones' | 'sprints' | 'backlog') => void;
   onOpenCreateModal: (type?: 'epic' | 'story' | 'task' | 'criteria') => void;
   onOpenSprintModal: () => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -13,21 +15,23 @@ export const Navbar: React.FC<NavbarProps> = ({
   onViewChange,
   onOpenCreateModal,
   onOpenSprintModal,
+  theme,
+  onToggleTheme,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand & Identity */}
           <div className="flex items-center space-x-3">
-            <div className="h-9 w-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold shadow-sm">
-              <Target className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <div className="h-9 w-9 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white flex items-center justify-center font-bold shadow-xs">
+              <Target className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
             <div>
-              <span className="font-semibold text-slate-900 text-base tracking-tight block">
-                NSFS Milestones
+              <span className="font-semibold text-slate-900 dark:text-slate-100 text-base tracking-tight block">
+                Sleep Score Dashboard
               </span>
-              <span className="text-xs text-slate-500 font-medium block">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium block">
                 Agile Milestone & Sprint Tracker
               </span>
             </div>
@@ -40,12 +44,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onViewChange('milestones')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 currentView === 'milestones'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <Target className="w-4 h-4" aria-hidden="true" />
+                <Target className="w-4 h-4 text-indigo-500" aria-hidden="true" />
                 Milestone Landing
               </span>
             </button>
@@ -55,8 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onViewChange('sprints')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 currentView === 'sprints'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
               }`}
             >
               <span className="flex items-center gap-1.5">
@@ -70,8 +74,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onViewChange('backlog')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 currentView === 'backlog'
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
               }`}
             >
               <span className="flex items-center gap-1.5">
@@ -81,24 +85,45 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Action CTAs */}
+          {/* Action CTAs & Theme Toggle in TOP RIGHT CORNER */}
           <div className="flex items-center space-x-2">
             <button
               type="button"
               onClick={onOpenSprintModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-300 rounded-md text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 active:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-400 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
             >
-              <PlusCircle className="w-4 h-4 text-slate-500" aria-hidden="true" />
-              <span>Sprint</span>
+              <PlusCircle className="w-4 h-4 text-slate-500 dark:text-slate-400" aria-hidden="true" />
+              <span className="hidden sm:inline">Sprint</span>
             </button>
 
             <button
               type="button"
               onClick={() => onOpenCreateModal('task')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-slate-900 transition"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm font-semibold rounded-md shadow-xs transition"
             >
-              <PlusCircle className="w-4 h-4 text-indigo-300" aria-hidden="true" />
+              <PlusCircle className="w-4 h-4" aria-hidden="true" />
               <span>Create Item</span>
+            </button>
+
+            {/* Dark/Light Mode Toggle Button in the Top Right Corner */}
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="inline-flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-md border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                  <span className="hidden sm:inline text-xs font-semibold">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-600" aria-hidden="true" />
+                  <span className="hidden sm:inline text-xs font-semibold">Dark Mode</span>
+                </>
+              )}
             </button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Task, Status, Priority } from '../../types';
+import type { Task, Status, Priority } from '../../types';
 import { CheckCircle2, Clock, ChevronDown, CheckSquare, Square, Tag } from 'lucide-react';
 
 interface TaskCardProps {
@@ -17,39 +17,39 @@ const statusConfig: Record<
 > = {
   TODO: {
     label: 'To Do',
-    bg: 'bg-slate-50',
-    text: 'text-slate-700',
-    border: 'border-slate-300',
-    dot: 'bg-slate-400',
+    bg: 'bg-slate-50 dark:bg-slate-800',
+    text: 'text-slate-700 dark:text-slate-300',
+    border: 'border-slate-300 dark:border-slate-700',
+    dot: 'bg-slate-400 dark:bg-slate-500',
   },
   IN_PROGRESS: {
     label: 'In Progress',
-    bg: 'bg-blue-50',
-    text: 'text-blue-700',
-    border: 'border-blue-200',
+    bg: 'bg-blue-50 dark:bg-blue-950/60',
+    text: 'text-blue-700 dark:text-blue-300',
+    border: 'border-blue-200 dark:border-blue-800',
     dot: 'bg-blue-500',
   },
   IN_REVIEW: {
     label: 'In Review',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    border: 'border-amber-200',
+    bg: 'bg-amber-50 dark:bg-amber-950/60',
+    text: 'text-amber-700 dark:text-amber-300',
+    border: 'border-amber-200 dark:border-amber-800',
     dot: 'bg-amber-500',
   },
   DONE: {
     label: 'Done',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/60',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    border: 'border-emerald-200 dark:border-emerald-800',
     dot: 'bg-emerald-500',
   },
 };
 
 const priorityConfig: Record<Priority, { label: string; text: string; bg: string }> = {
-  LOW: { label: 'Low', text: 'text-slate-600', bg: 'bg-slate-100' },
-  MEDIUM: { label: 'Med', text: 'text-sky-700', bg: 'bg-sky-50' },
-  HIGH: { label: 'High', text: 'text-orange-700', bg: 'bg-orange-50' },
-  CRITICAL: { label: 'Urgent', text: 'text-rose-700', bg: 'bg-rose-50' },
+  LOW: { label: 'Low', text: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-slate-800' },
+  MEDIUM: { label: 'Med', text: 'text-sky-700 dark:text-sky-300', bg: 'bg-sky-50 dark:bg-sky-950/60' },
+  HIGH: { label: 'High', text: 'text-orange-700 dark:text-orange-300', bg: 'bg-orange-50 dark:bg-orange-950/60' },
+  CRITICAL: { label: 'Urgent', text: 'text-rose-700 dark:text-rose-300', bg: 'bg-rose-50 dark:bg-rose-950/60' },
 };
 
 export const TaskCard: React.FC<TaskCardProps> = ({
@@ -61,7 +61,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onAssignSprint,
 }) => {
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
-  const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const [showCriteria, setShowCriteria] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +69,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsStatusMenuOpen(false);
-        setIsSprintMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -83,7 +81,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
   return (
     <article
-      className="bg-white rounded-lg border border-slate-200 p-4 shadow-xs hover:border-slate-300 transition-all space-y-3"
+      className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all space-y-3"
       aria-label={`Task: ${task.title}`}
     >
       {/* Header: Title and 2-Click Status Changer */}
@@ -97,7 +95,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             </span>
 
             {task.sprint && (
-              <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 flex items-center gap-1">
+              <span className="text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center gap-1">
                 <Tag className="w-3 h-3" aria-hidden="true" />
                 {task.sprint.name}
               </span>
@@ -106,7 +104,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
           <h3
             onClick={() => onEditTask?.(task)}
-            className="text-sm font-semibold text-slate-900 hover:text-indigo-600 cursor-pointer transition-colors"
+            className="text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
           >
             {task.title}
           </h3>
@@ -132,10 +130,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           {/* Click 2: Click the target status from dropdown */}
           {isStatusMenuOpen && (
             <div
-              className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-md shadow-lg z-20 py-1"
+              className="absolute right-0 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md shadow-xl z-20 py-1"
               role="menu"
             >
-              <div className="px-2 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              <div className="px-2 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                 Select Status (Click 2)
               </div>
               {statuses.map((status) => {
@@ -149,8 +147,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                       onStatusChange(task.id, status);
                       setIsStatusMenuOpen(false);
                     }}
-                    className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
-                      isSelected ? 'font-semibold text-slate-900 bg-slate-50' : 'text-slate-700'
+                    className={`w-full text-left px-2.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${
+                      isSelected
+                        ? 'font-semibold text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/80'
+                        : 'text-slate-700 dark:text-slate-300'
                     }`}
                     role="menuitem"
                   >
@@ -159,7 +159,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                       {conf.label}
                     </span>
                     {isSelected && (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                     )}
                   </button>
                 );
@@ -169,38 +169,38 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         </div>
       </div>
 
-      {/* User Story Template Box: As a ..., I want to ..., so that... (Requirement 1) */}
+      {/* User Story Template Box: As a ..., I want to ..., so that... */}
       {(task.role || task.want || task.soThat) && (
-        <div className="bg-slate-50 rounded p-2.5 text-xs border border-slate-200/80 space-y-1">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded p-2.5 text-xs border border-slate-200/80 dark:border-slate-800 space-y-1">
           {task.role && (
-            <p className="text-slate-700">
-              <span className="font-semibold text-slate-800">As a</span> {task.role}
+            <p className="text-slate-700 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">As a</span> {task.role}
             </p>
           )}
           {task.want && (
-            <p className="text-slate-700">
-              <span className="font-semibold text-slate-800">I want to</span> {task.want}
+            <p className="text-slate-700 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">I want to</span> {task.want}
             </p>
           )}
           {task.soThat && (
-            <p className="text-slate-700">
-              <span className="font-semibold text-slate-800">so that</span> {task.soThat}
+            <p className="text-slate-700 dark:text-slate-300">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">so that</span> {task.soThat}
             </p>
           )}
         </div>
       )}
 
-      {/* Acceptance Criteria (Given ..., When ..., Then ...) - Requirement 2 */}
+      {/* Acceptance Criteria (Given ..., When ..., Then ...) */}
       {task.acceptanceCriteria && task.acceptanceCriteria.length > 0 && (
         <div className="pt-1">
           <button
             type="button"
             onClick={() => setShowCriteria(!showCriteria)}
-            className="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors"
+            className="text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1 transition-colors"
           >
             <span>
               {task.acceptanceCriteria.filter((ac) => ac.isMet).length}/
-              {task.acceptanceCriteria.length} Acceptance Criteria
+              {task.acceptanceCriteria.length} Sleep Score Criteria
             </span>
             <ChevronDown
               className={`w-3 h-3 transition-transform ${showCriteria ? 'rotate-180' : ''}`}
@@ -209,24 +209,24 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </button>
 
           {showCriteria && (
-            <ul className="mt-2 space-y-2 pl-1 border-l-2 border-slate-200" aria-label="Acceptance Criteria">
+            <ul className="mt-2 space-y-2 pl-1 border-l-2 border-slate-200 dark:border-slate-700" aria-label="Acceptance Criteria">
               {task.acceptanceCriteria.map((ac) => (
                 <li
                   key={ac.id}
                   onClick={() => onToggleCriterion?.(ac.id)}
-                  className="text-xs text-slate-700 cursor-pointer flex items-start gap-2 hover:bg-slate-50 p-1 rounded"
+                  className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer flex items-start gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/60 p-1 rounded transition-colors"
                 >
                   {ac.isMet ? (
-                    <CheckSquare className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" aria-hidden="true" />
+                    <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" aria-hidden="true" />
                   ) : (
-                    <Square className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" aria-hidden="true" />
+                    <Square className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 mt-0.5 shrink-0" aria-hidden="true" />
                   )}
-                  <div className={ac.isMet ? 'line-through text-slate-400' : ''}>
-                    <span className="font-semibold text-slate-800">Given </span>
+                  <div className={ac.isMet ? 'line-through text-slate-400 dark:text-slate-500' : ''}>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">Given </span>
                     {ac.given}
-                    <span className="font-semibold text-slate-800"> When </span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100"> When </span>
                     {ac.when}
-                    <span className="font-semibold text-slate-800"> Then </span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100"> Then </span>
                     {ac.then}
                   </div>
                 </li>
@@ -236,9 +236,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         </div>
       )}
 
-      {/* Footer: Sprint Assignment Selector (Requirement 6) */}
+      {/* Footer: Sprint Assignment Selector */}
       {allSprints.length > 0 && onAssignSprint && (
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" aria-hidden="true" />
             Sprint:
@@ -246,12 +246,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <select
             value={task.sprintId || ''}
             onChange={(e) => onAssignSprint(task.id, e.target.value)}
-            className="text-xs bg-transparent border border-slate-200 rounded px-1.5 py-0.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400"
+            className="text-xs bg-transparent border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-400"
             aria-label="Assign to sprint"
           >
             <option value="">(Backlog / No Sprint)</option>
             {allSprints.map((s) => (
-              <option key={s.id} value={s.id}>
+              <option key={s.id} value={s.id} className="dark:bg-slate-900">
                 {s.name}
               </option>
             ))}

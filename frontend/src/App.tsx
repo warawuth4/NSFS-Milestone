@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Milestone, Sprint, Epic, Story, Task, Status } from './types';
+import type { Milestone, Sprint, Epic, Story, Task, Status } from './types';
 import { api } from './services/api';
 import { Navbar } from './components/layout/Navbar';
 import { MilestoneOverview } from './components/milestone/MilestoneOverview';
@@ -7,7 +7,7 @@ import { SprintsView } from './components/sprint/SprintsView';
 import { BacklogView } from './components/backlog/BacklogView';
 import { CreateItemModal, ItemType } from './components/forms/CreateItemModal';
 import { SprintModal } from './components/sprint/SprintModal';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 
 export function App() {
   const [currentView, setCurrentView] = useState<'milestones' | 'sprints' | 'backlog'>('milestones');
@@ -17,6 +17,26 @@ export function App() {
   const [stories, setStories] = useState<Story[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Dark Mode State: Default to 'dark' as explicitly required
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return 'dark'; // Default is dark mode
+  });
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Modals
   const [isCreateItemModalOpen, setIsCreateItemModalOpen] = useState(false);
@@ -107,25 +127,25 @@ export function App() {
   // Create Item Handlers
   const handleCreateEpic = async (data: any) => {
     await api.epics.create(data);
-    showToast('Epic created successfully');
+    showToast('Sleep Score Epic created successfully');
     loadData();
   };
 
   const handleCreateStory = async (data: any) => {
     await api.stories.create(data);
-    showToast('Story created successfully');
+    showToast('Sleep Score Story created successfully');
     loadData();
   };
 
   const handleCreateTask = async (data: any) => {
     await api.tasks.create(data);
-    showToast('Task created successfully');
+    showToast('Sleep Score Task created successfully');
     loadData();
   };
 
   const handleCreateCriteria = async (data: any) => {
     await api.acceptanceCriteria.create(data);
-    showToast('Acceptance criterion created');
+    showToast('Sleeping score acceptance criterion created');
     loadData();
   };
 
@@ -133,7 +153,6 @@ export function App() {
   const handleSaveSprint = async (data: Partial<Sprint>, assignedTaskIds: string[]) => {
     if (sprintToEdit) {
       await api.sprints.update(sprintToEdit.id, data);
-      // Re-assign tasks
       for (const taskId of assignedTaskIds) {
         await api.sprints.assignTask(sprintToEdit.id, taskId);
       }
@@ -150,27 +169,27 @@ export function App() {
 
   const activeMilestone = milestones[0] || {
     id: 'default',
-    title: 'Q1 Core Milestone',
+    title: 'Milestone 1: Sleep Score Dashboard Engine',
     status: 'IN_PROGRESS',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors selection:bg-indigo-500 selection:text-white">
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 text-xs font-medium animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="fixed bottom-5 right-5 z-50 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2.5 rounded-lg shadow-xl flex items-center gap-2 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200"
           role="status"
           aria-live="polite"
         >
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" aria-hidden="true" />
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" aria-hidden="true" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Top Navbar */}
+      {/* Top Navbar with Theme Toggle Button in the Top Right Corner */}
       <Navbar
         currentView={currentView}
         onViewChange={setCurrentView}
@@ -182,13 +201,15 @@ export function App() {
           setSprintToEdit(null);
           setIsSprintModalOpen(true);
         }}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main Page Container */}
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {loading ? (
-          <div className="h-64 flex items-center justify-center text-xs text-slate-400">
-            Loading milestone workspace...
+          <div className="h-64 flex items-center justify-center text-xs text-slate-400 dark:text-slate-500">
+            Loading sleeping score milestone workspace...
           </div>
         ) : (
           <>
@@ -275,9 +296,9 @@ export function App() {
       />
 
       {/* Accessible Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-          NSFS Milestone Tracker &bull; NestJS Backend on Render &bull; React Frontend on Vercel &bull; Supabase PostgreSQL
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 mt-auto transition-colors">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+          Sleep Score Dashboard &bull; NestJS Backend on Render &bull; React Frontend on Vercel &bull; Supabase PostgreSQL
         </div>
       </footer>
     </div>

@@ -1,4 +1,4 @@
-import {
+import type {
   Milestone,
   Sprint,
   Epic,
@@ -6,19 +6,16 @@ import {
   Task,
   AcceptanceCriterion,
   Status,
-  MilestoneStatus,
-  SprintStatus,
-  Priority,
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
-// Built-in initial mock dataset ensuring immediate out-of-the-box interactivity
+// Built-in initial mock dataset specifically focused on "Dashboard for Sleeping Score"
 let mockMilestones: Milestone[] = [
   {
-    id: 'm-core-1',
-    title: 'Milestone 1: Agile Platform & Milestone Tracker',
-    description: 'Deliver core milestone dashboards, 2-click task status progression, and template-based agile workflows.',
+    id: 'm-sleep-1',
+    title: 'Milestone 1: Sleep Score Dashboard & Circadian Analytics Engine',
+    description: 'Deliver the core biometric sleep score calculation, hypnogram stage visualizer, and 2-click task progress transitions.',
     targetDate: '2026-04-30T23:59:59.000Z',
     status: 'IN_PROGRESS',
     progress: {
@@ -39,12 +36,12 @@ let mockMilestones: Milestone[] = [
 let mockSprints: Sprint[] = [
   {
     id: 'sp-1',
-    name: 'Sprint 1 - Foundation & Milestone Board',
-    goal: 'Build responsive milestone dashboard, sprint cards, and fast 2-click status changing.',
+    name: 'Sprint 1 - Biometric Ingestion & Sleep Score Algorithm',
+    goal: 'Compute weighted 0-100 sleeping score and render landing page gauge with 2-click status changing.',
     startDate: '2026-03-01T00:00:00.000Z',
     endDate: '2026-03-14T23:59:59.000Z',
     status: 'ACTIVE',
-    milestoneId: 'm-core-1',
+    milestoneId: 'm-sleep-1',
     tasks: [],
     progress: {
       totalTasks: 3,
@@ -59,12 +56,12 @@ let mockSprints: Sprint[] = [
   },
   {
     id: 'sp-2',
-    name: 'Sprint 2 - Sprint Planning & Backlog Allocation',
-    goal: 'Allow drag/allocate tasks into sprints and edit sprint duration.',
+    name: 'Sprint 2 - Nocturnal Hypnogram & Stage Distribution Charts',
+    goal: 'Visualize deep, REM, and light sleep stages and calculate sleep debt benchmarks.',
     startDate: '2026-03-15T00:00:00.000Z',
     endDate: '2026-03-28T23:59:59.000Z',
     status: 'PLANNED',
-    milestoneId: 'm-core-1',
+    milestoneId: 'm-sleep-1',
     tasks: [],
     progress: {
       totalTasks: 1,
@@ -82,14 +79,14 @@ let mockSprints: Sprint[] = [
 let mockEpics: Epic[] = [
   {
     id: 'e-1',
-    title: 'Milestone Execution & Progress Management',
-    role: 'Product Lead',
-    want: 'track high-level milestone progress and task velocity across active sprints',
-    soThat: 'our engineering team delivers on scheduled release dates with high predictability',
-    description: 'Covers milestone landing cards, sprint management, and fast status transitions.',
+    title: 'Sleep Score Health & Circadian Rhythm Analytics Engine',
+    role: 'wellness enthusiast and wearable device user',
+    want: 'view my holistic daily sleep score and sleep stage breakdown in a centralized health dashboard',
+    soThat: 'I can understand factors disrupting my deep sleep and optimize my nighttime recovery habits',
+    description: 'Consolidates biometric sleep duration, sleep efficiency percentages, and circadian rhythm trends.',
     status: 'IN_PROGRESS',
     priority: 'HIGH',
-    milestoneId: 'm-core-1',
+    milestoneId: 'm-sleep-1',
     stories: [],
     acceptanceCriteria: [],
     createdAt: new Date().toISOString(),
@@ -100,11 +97,11 @@ let mockEpics: Epic[] = [
 let mockStories: Story[] = [
   {
     id: 'st-1',
-    title: '2-Click Task Progress Quick Changer',
-    role: 'Team Developer',
-    want: 'change task progress status with a maximum of 2 clicks directly from the milestone page',
-    soThat: 'I never waste time navigating away to update my daily task work',
-    description: 'Inline status badge click opens menu, second click commits status update.',
+    title: 'Nocturnal Sleep Stage Hypnogram & Restorative Score Gauge',
+    role: 'insomnia patient tracking sleep hygiene',
+    want: 'visualize the ratio of REM, deep, and light sleep compared to clinical benchmarks',
+    soThat: 'I can identify wakefulness interruptions and discuss actionable trends with my sleep physician',
+    description: 'Renders time-series hypnogram bar charts and calculates deep sleep target thresholds.',
     status: 'IN_PROGRESS',
     priority: 'HIGH',
     epicId: 'e-1',
@@ -118,26 +115,11 @@ let mockStories: Story[] = [
 let mockTasks: Task[] = [
   {
     id: 't-1',
-    title: 'Implement Milestone Landing Page UI',
-    role: 'Frontend Architect',
-    want: 'see the project milestone dashboard immediately on landing',
-    soThat: 'I have instant visibility into project status without extra navigation',
-    description: 'Header, milestone summary, completion bar, sprint filters, and task cards.',
-    status: 'DONE',
-    priority: 'HIGH',
-    storyId: 'st-1',
-    sprintId: 'sp-1',
-    acceptanceCriteria: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 't-2',
-    title: 'Fast 2-Click Status Transition Dropdown',
-    role: 'Frontend Engineer',
-    want: 'click a status badge and choose new status from a clean dropdown in 2 clicks',
-    soThat: 'my workflow stays fluid and responsive',
-    description: 'Supports TODO, IN_PROGRESS, IN_REVIEW, and DONE states.',
+    title: 'Compute Weighted 0-100 Sleep Score Algorithm',
+    role: 'health data engineer',
+    want: 'compute weighted 0-100 sleep scores combining total sleep time, heart rate variability, and tossing frequency',
+    soThat: 'the frontend dashboard renders accurate score gauges within 200 milliseconds of device sync',
+    description: 'Implements Poisson regression on tossing episodes and factors nocturnal heart rate dip.',
     status: 'DONE',
     priority: 'CRITICAL',
     storyId: 'st-1',
@@ -147,11 +129,26 @@ let mockTasks: Task[] = [
     updatedAt: new Date().toISOString(),
   },
   {
+    id: 't-2',
+    title: 'Implement 2-Click Task Progress Dropdown on Milestone Dashboard',
+    role: 'frontend engineer',
+    want: 'change task progress directly from the milestone page in 2 clicks',
+    soThat: 'our project milestone completion percentage updates immediately',
+    description: 'Supports TODO, IN_PROGRESS, IN_REVIEW, and DONE states within 2 clicks.',
+    status: 'DONE',
+    priority: 'HIGH',
+    storyId: 'st-1',
+    sprintId: 'sp-1',
+    acceptanceCriteria: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
     id: 't-3',
-    title: 'User Story Template Dialog (As a ..., I want to ..., so that...)',
-    role: 'Scrum Master',
-    want: 'enforce consistent user story templates with gray example sentence hints',
-    soThat: 'all tasks and requirements follow industry agile standards',
+    title: 'Sleep Stage Breakdown & REM Progression Chart Widget',
+    role: 'data visualization specialist',
+    want: 'render interactive hypnograms displaying duration in deep sleep, REM, and light sleep',
+    soThat: 'users can quickly inspect their restorative sleep architecture on the dashboard',
     status: 'IN_PROGRESS',
     priority: 'HIGH',
     storyId: 'st-1',
@@ -162,10 +159,10 @@ let mockTasks: Task[] = [
   },
   {
     id: 't-4',
-    title: 'Given-When-Then Acceptance Criteria Verification',
-    role: 'QA Engineer',
-    want: 'create acceptance criteria with Given-When-Then fill boxes and toggle status',
-    soThat: 'definition of done is clear and verified for every task',
+    title: 'Sleep Debt & Circadian Rhythm Calibration',
+    role: 'sleep science researcher',
+    want: 'calculate accumulated weekly sleep debt based on personal biological sleep targets',
+    soThat: 'the score gauge warns users when chronic sleep deficit requires weekend recovery sleep',
     status: 'TODO',
     priority: 'MEDIUM',
     storyId: 'st-1',
@@ -179,9 +176,9 @@ let mockTasks: Task[] = [
 let mockAcceptanceCriteria: AcceptanceCriterion[] = [
   {
     id: 'ac-1',
-    given: 'a project stakeholder is on the Milestone landing page',
-    when: 'the user inspects task progress',
-    then: 'the milestone progress percentage reflects the aggregated state of all linked tasks',
+    given: 'an authenticated user has synchronized 420 minutes of nocturnal wearable sleep logs',
+    when: 'the calculation engine completes analyzing deep sleep duration, awake minutes, and heart rate dip',
+    then: 'the sleeping score dashboard renders a circular score gauge between 0 and 100 with restorative tier categorization',
     isMet: true,
     taskId: 't-1',
     createdAt: new Date().toISOString(),
@@ -189,21 +186,21 @@ let mockAcceptanceCriteria: AcceptanceCriterion[] = [
   },
   {
     id: 'ac-2',
-    given: 'any fill box on epic, story, task, or acceptance criteria dialogs',
-    when: 'the fill box is empty',
-    then: 'helpful example sentences are shown in subtle gray placeholder and guide text',
+    given: 'a user inspecting tasks on the sleep score milestone overview',
+    when: 'the user clicks the progress status badge and selects "DONE"',
+    then: 'the task status transitions and the milestone completion percentage updates within exactly 2 clicks',
     isMet: true,
-    taskId: 't-3',
+    taskId: 't-2',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: 'ac-3',
-    given: 'a task displayed on the milestone page',
-    when: 'the user clicks the status badge and selects a status',
-    then: 'the progress updates within exactly 2 clicks and recalculates milestone percentage',
+    given: 'a user creating a work item for sleeping score tracking',
+    when: 'the user opens the creation fill box',
+    then: 'each fill box displays helpful topic-specific example sentences in gray text',
     isMet: true,
-    taskId: 't-2',
+    taskId: 't-3',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -264,8 +261,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
     return await response.json();
   } catch (err) {
-    // If backend is not reached, fall back to robust local in-memory dataset
-    console.info(`API call to ${path} falling back to local memory store.`);
     return handleMockRequest<T>(path, options);
   }
 }
@@ -555,7 +550,6 @@ export const api = {
     getOne: (id: string) => request<Task>(`/tasks/${id}`),
     create: (data: Partial<Task>) => request<Task>('/tasks', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: Partial<Task>) => request<Task>(`/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-    // Rapid 2-click status update endpoint (Requirements 7 & 8)
     updateStatus: (id: string, status: Status) =>
       request<Task>(`/tasks/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
     delete: (id: string) => request<{ success: boolean }>(`/tasks/${id}`, { method: 'DELETE' }),
