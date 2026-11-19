@@ -8,10 +8,10 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node --max-old-space-size=450 dist/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node --max-old-space-size=450 dist/main",
+    "start:prod": "node --max-old-space-size=450 dist/main.js",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "test": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest",
