@@ -1,0 +1,14 @@
+{
+  "name": "nsfs-milestone-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NSFS Milestone Tracking & Agile Management System",
+  "scripts": {
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "test": "npm run test --prefix backend",
+    "test:integration": "npm run test:integration --prefix backend",
+    "test:e2e": "npm run test:e2e --prefix backend",
+    "start:backend": "npm run start:dev --prefix backend",
+    "start:frontend": "npm run dev --prefix frontend"
+  }
+}
