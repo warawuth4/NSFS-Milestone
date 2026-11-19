@@ -38,21 +38,32 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       return;
     }
 
+    const hasExplicitUrl = Boolean(this.configService.get<string>('REDIS_URL') || process.env.REDIS_URL);
+    const isLocalhost = this.redisUrl.includes('localhost') || this.redisUrl.includes('127.0.0.1');
+
+    // In production, Render services run in isolated containers without a local Redis daemon.
+    // If no external REDIS_URL was configured in Render Dashboard, operate smoothly with in-memory cache without logging repeated connection errors.
+    if (process.env.NODE_ENV === 'production' && (!hasExplicitUrl || isLocalhost)) {
+      this.logger.warn(
+        'No external REDIS_URL configured in production environment (defaulting to resilient in-memory caching). ' +
+        'To connect to a Redis instance on Render, create a Redis service and add REDIS_URL to your Render Environment Variables.',
+      );
+      return;
+    }
+
     try {
       this.logger.log(`Attempting connection to Redis at ${this.maskUrl(this.redisUrl)}...`);
       this.client = new Redis(this.redisUrl, {
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         enableOfflineQueue: false,
-        connectTimeout: 2000,
+        connectTimeout: 3000,
         retryStrategy: (times) => {
-          if (times > 3) {
-            this.logger.warn(
-              `Redis retry limit reached (${times}). Falling back to resilient in-memory caching.`,
-            );
+          if (times > 2) {
+            this.logger.warn('Redis retry limit reached. Continuing in resilient in-memory mode.');
             return null; // Stop retrying
           }
-          return Math.min(times * 300, 1500);
+          return Math.min(times * 500, 1500);
         },
       });
 
@@ -67,12 +78,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
       this.client.on('error', (err) => {
         this.isConnected = false;
-        this.logger.warn(`Redis connection error: ${err.message}. Resilient in-memory fallback active.`);
+        if (err.message && !err.message.includes('Connection is closed')) {
+          this.logger.warn(`Redis connection error: ${err.message}. Resilient in-memory fallback active.`);
+        }
       });
 
       this.client.on('close', () => {
         this.isConnected = false;
-        this.logger.warn('Redis connection closed.');
       });
 
       // Attempt initial connect asynchronously with short timeout
