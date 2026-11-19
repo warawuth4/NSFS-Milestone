@@ -21,7 +21,7 @@ export class StoriesService {
         description: dto.description,
         status: dto.status || Status.TODO,
         priority: dto.priority,
-        epicId: dto.epicId,
+        epicId: dto.epicId && dto.epicId.trim() !== '' ? dto.epicId : null,
       },
       include: {
         epic: true,
@@ -96,7 +96,9 @@ export class StoriesService {
         ...(dto.description !== undefined && { description: dto.description }),
         ...(dto.status !== undefined && { status: dto.status }),
         ...(dto.priority !== undefined && { priority: dto.priority }),
-        ...(dto.epicId !== undefined && { epicId: dto.epicId }),
+        ...(dto.epicId !== undefined && {
+          epicId: dto.epicId && dto.epicId.trim() !== '' ? dto.epicId : null,
+        }),
       },
       include: {
         epic: true,

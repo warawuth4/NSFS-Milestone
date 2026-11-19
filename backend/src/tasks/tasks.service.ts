@@ -21,8 +21,8 @@ export class TasksService {
         description: dto.description,
         status: dto.status || Status.TODO,
         priority: dto.priority,
-        storyId: dto.storyId,
-        sprintId: dto.sprintId,
+        storyId: dto.storyId && dto.storyId.trim() !== '' ? dto.storyId : null,
+        sprintId: dto.sprintId && dto.sprintId.trim() !== '' ? dto.sprintId : null,
       },
       include: {
         story: {

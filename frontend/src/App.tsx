@@ -41,6 +41,7 @@ export function App() {
   // Modals
   const [isCreateItemModalOpen, setIsCreateItemModalOpen] = useState(false);
   const [createItemDefaultType, setCreateItemDefaultType] = useState<ItemType>('task');
+  const [createItemDefaultParentId, setCreateItemDefaultParentId] = useState<string | undefined>(undefined);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
   const [sprintToEdit, setSprintToEdit] = useState<Sprint | null>(null);
 
@@ -195,6 +196,7 @@ export function App() {
         onViewChange={setCurrentView}
         onOpenCreateModal={(type = 'task') => {
           setCreateItemDefaultType(type);
+          setCreateItemDefaultParentId(undefined);
           setIsCreateItemModalOpen(true);
         }}
         onOpenSprintModal={() => {
@@ -224,6 +226,7 @@ export function App() {
                 onAssignSprint={handleAssignSprint}
                 onOpenCreateItem={(type = 'task') => {
                   setCreateItemDefaultType(type);
+                  setCreateItemDefaultParentId(undefined);
                   setIsCreateItemModalOpen(true);
                 }}
                 onOpenCreateSprint={() => {
@@ -262,8 +265,9 @@ export function App() {
                 onStatusChange={handleStatusChange}
                 onToggleCriterion={handleToggleCriterion}
                 onAssignSprint={handleAssignSprint}
-                onOpenCreateItem={(type = 'story') => {
+                onOpenCreateItem={(type = 'story', parentId?: string) => {
                   setCreateItemDefaultType(type);
+                  setCreateItemDefaultParentId(parentId);
                   setIsCreateItemModalOpen(true);
                 }}
               />
@@ -277,6 +281,7 @@ export function App() {
         isOpen={isCreateItemModalOpen}
         onClose={() => setIsCreateItemModalOpen(false)}
         defaultType={createItemDefaultType}
+        defaultParentId={createItemDefaultParentId}
         epics={epics}
         stories={stories}
         sprints={sprints}

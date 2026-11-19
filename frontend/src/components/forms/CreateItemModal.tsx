@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Epic, Story, Sprint, Priority, Status } from '../../types';
 import { X, HelpCircle, CheckSquare } from 'lucide-react';
 
@@ -8,6 +8,7 @@ interface CreateItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultType?: ItemType;
+  defaultParentId?: string;
   epics: Epic[];
   stories: Story[];
   sprints: Sprint[];
@@ -51,6 +52,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
   isOpen,
   onClose,
   defaultType = 'task',
+  defaultParentId,
   epics,
   stories,
   sprints,
@@ -73,9 +75,36 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
   const [soThat, setSoThat] = useState('');
 
   // Parent links
-  const [selectedEpicId, setSelectedEpicId] = useState<string>(epics[0]?.id || '');
-  const [selectedStoryId, setSelectedStoryId] = useState<string>(stories[0]?.id || '');
+  const [selectedEpicId, setSelectedEpicId] = useState<string>(defaultParentId || epics[0]?.id || '');
+  const [selectedStoryId, setSelectedStoryId] = useState<string>(defaultParentId || stories[0]?.id || '');
   const [selectedSprintId, setSelectedSprintId] = useState<string>(sprints[0]?.id || '');
+
+  // Synchronize itemType and parent selections whenever the modal opens or props update
+  useEffect(() => {
+    if (isOpen) {
+      if (defaultType) {
+        setItemType(defaultType);
+      }
+      if (defaultParentId) {
+        if (epics.some((e) => e.id === defaultParentId)) {
+          setSelectedEpicId(defaultParentId);
+        }
+        if (stories.some((s) => s.id === defaultParentId)) {
+          setSelectedStoryId(defaultParentId);
+        }
+      } else {
+        if (epics.length > 0 && (!selectedEpicId || !epics.some((e) => e.id === selectedEpicId))) {
+          setSelectedEpicId(epics[0].id);
+        }
+        if (stories.length > 0 && (!selectedStoryId || !stories.some((s) => s.id === selectedStoryId))) {
+          setSelectedStoryId(stories[0].id);
+        }
+      }
+      if (sprints.length > 0 && (!selectedSprintId || !sprints.some((sp) => sp.id === selectedSprintId))) {
+        setSelectedSprintId(sprints[0].id);
+      }
+    }
+  }, [isOpen, defaultType, defaultParentId, epics, stories, sprints]);
 
   // Acceptance Criteria Template: Given ..., When ..., Then ...
   const [given, setGiven] = useState('');
@@ -114,6 +143,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
           status,
         });
       } else if (itemType === 'story') {
+        const finalEpicId = selectedEpicId || defaultParentId || (epics.length > 0 ? epics[0].id : undefined);
         await onCreateStory({
           title,
           description: description || undefined,
@@ -122,9 +152,10 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
           soThat: soThat || undefined,
           priority,
           status,
-          epicId: selectedEpicId || undefined,
+          epicId: finalEpicId || undefined,
         });
       } else if (itemType === 'task') {
+        const finalStoryId = selectedStoryId || defaultParentId || (stories.length > 0 ? stories[0].id : undefined);
         await onCreateTask({
           title,
           description: description || undefined,
@@ -133,7 +164,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
           soThat: soThat || undefined,
           priority,
           status,
-          storyId: selectedStoryId || undefined,
+          storyId: finalStoryId || undefined,
           sprintId: selectedSprintId || undefined,
           ...(includeCriteria && given && when && then
             ? {
@@ -437,15 +468,16 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {itemType === 'story' && epics.length > 0 && (
               <div className="space-y-1">
-                <label htmlFor="parent-epic" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="parent-epic" className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
                   Parent Epic
                 </label>
                 <select
                   id="parent-epic"
-                  value={selectedEpicId}
+                  value={selectedEpicId || (epics[0]?.id ?? '')}
                   onChange={(e) => setSelectedEpicId(e.target.value)}
                   className="w-full text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 >
+                  <option value="">-- No Parent Epic --</option>
                   {epics.map((e) => (
                     <option key={e.id} value={e.id}>
                       {e.title}
@@ -457,15 +489,16 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
 
             {itemType === 'task' && stories.length > 0 && (
               <div className="space-y-1">
-                <label htmlFor="parent-story" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="parent-story" className="block text-xs font-semibold text-slate-800 dark:text-slate-200">
                   Parent Story
                 </label>
                 <select
                   id="parent-story"
-                  value={selectedStoryId}
+                  value={selectedStoryId || (stories[0]?.id ?? '')}
                   onChange={(e) => setSelectedStoryId(e.target.value)}
                   className="w-full text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 >
+                  <option value="">-- No Parent Story --</option>
                   {stories.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.title}

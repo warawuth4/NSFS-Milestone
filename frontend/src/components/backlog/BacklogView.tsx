@@ -11,7 +11,7 @@ interface BacklogViewProps {
   onStatusChange: (taskId: string, newStatus: Status) => void;
   onToggleCriterion?: (criterionId: string) => void;
   onAssignSprint: (taskId: string, sprintId: string) => void;
-  onOpenCreateItem: (type?: 'epic' | 'story' | 'task' | 'criteria') => void;
+  onOpenCreateItem: (type?: 'epic' | 'story' | 'task' | 'criteria', parentId?: string) => void;
 }
 
 export const BacklogView: React.FC<BacklogViewProps> = ({
@@ -80,13 +80,22 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
               >
                 {/* Epic Header */}
                 <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                      EPIC
-                    </span>
-                    <span className="text-xs px-2 py-0.5 rounded font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {epic.status}
-                    </span>
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                        EPIC
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        {epic.status}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onOpenCreateItem('story', epic.id)}
+                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                    >
+                      + Add Story to Epic
+                    </button>
                   </div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{epic.title}</h2>
 
@@ -119,7 +128,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
                       No stories linked to this epic yet.{' '}
                       <button
                         type="button"
-                        onClick={() => onOpenCreateItem('story')}
+                        onClick={() => onOpenCreateItem('story', epic.id)}
                         className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
                       >
                         Add Story
@@ -152,7 +161,7 @@ export const BacklogView: React.FC<BacklogViewProps> = ({
 
                             <button
                               type="button"
-                              onClick={() => onOpenCreateItem('task')}
+                              onClick={() => onOpenCreateItem('task', story.id)}
                               className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                             >
                               + Add Task
