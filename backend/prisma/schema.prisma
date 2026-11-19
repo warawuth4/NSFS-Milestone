@@ -1,0 +1,142 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Status {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum MilestoneStatus {
+  PLANNED
+  IN_PROGRESS
+  ACHIEVED
+  PAUSED
+}
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Milestone {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  targetDate  DateTime?
+  status      MilestoneStatus @default(IN_PROGRESS)
+  sprints     Sprint[]
+  epics       Epic[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("milestones")
+}
+
+model Sprint {
+  id          String       @id @default(uuid())
+  name        String
+  goal        String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      SprintStatus @default(PLANNED)
+  milestoneId String?
+  milestone   Milestone?   @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  tasks       Task[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("sprints")
+}
+
+model Epic {
+  id                 String                @id @default(uuid())
+  title              String
+  role               String?
+  want               String?
+  soThat             String?
+  description        String?
+  status             Status                @default(TODO)
+  priority           Priority              @default(MEDIUM)
+  milestoneId        String?
+  milestone          Milestone?            @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  stories            Story[]
+  acceptanceCriteria AcceptanceCriterion[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@map("epics")
+}
+
+model Story {
+  id                 String                @id @default(uuid())
+  title              String
+  role               String?
+  want               String?
+  soThat             String?
+  description        String?
+  status             Status                @default(TODO)
+  priority           Priority              @default(MEDIUM)
+  epicId             String?
+  epic               Epic?                 @relation(fields: [epicId], references: [id], onDelete: Cascade)
+  tasks              Task[]
+  acceptanceCriteria AcceptanceCriterion[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@map("stories")
+}
+
+model Task {
+  id                 String                @id @default(uuid())
+  title              String
+  role               String?
+  want               String?
+  soThat             String?
+  description        String?
+  status             Status                @default(TODO)
+  priority           Priority              @default(MEDIUM)
+  storyId            String?
+  story              Story?                @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  sprintId           String?
+  sprint             Sprint?               @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  acceptanceCriteria AcceptanceCriterion[]
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  @@map("tasks")
+}
+
+model AcceptanceCriterion {
+  id        String   @id @default(uuid())
+  given     String
+  when      String
+  then      String
+  isMet     Boolean  @default(false)
+  epicId    String?
+  epic      Epic?    @relation(fields: [epicId], references: [id], onDelete: Cascade)
+  storyId   String?
+  story     Story?   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("acceptance_criteria")
+}
