@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 import { UpdateSprintDto } from './dto/update-sprint.dto';
 import { SprintStatus } from '@prisma/client';
@@ -8,7 +9,20 @@ import { SprintStatus } from '@prisma/client';
 export class SprintsService {
   private readonly logger = new Logger(SprintsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
+
+  private async invalidateCaches() {
+    if (this.redis) {
+      await Promise.all([
+        this.redis.delByPattern('sprints:*'),
+        this.redis.delByPattern('milestones:*'),
+        this.redis.delByPattern('tasks:*'),
+      ]);
+    }
+  }
 
   async create(dto: CreateSprintDto) {
     this.logger.log(`Creating sprint: ${dto.name}`);
@@ -27,11 +41,21 @@ export class SprintsService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Sprint created successfully: ID ${sprint.id}`);
     return sprint;
   }
 
   async findAll(milestoneId?: string, status?: SprintStatus) {
+    const cacheKey = `sprints:${milestoneId ?? 'all'}:${status ?? 'all'}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any[]>(cacheKey);
+      if (cached) {
+        this.logger.log(`Returning sprints from Redis cache (${cacheKey})`);
+        return cached;
+      }
+    }
+
     this.logger.log(`Finding sprints (milestone: ${milestoneId ?? 'all'}, status: ${status ?? 'all'})`);
     const sprints = await this.prisma.sprint.findMany({
       where: {
@@ -54,10 +78,24 @@ export class SprintsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return sprints.map((sprint) => this.calculateSprintMetrics(sprint));
+    const result = sprints.map((sprint) => this.calculateSprintMetrics(sprint));
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, result, 60);
+    }
+
+    return result;
   }
 
   async findOne(id: string) {
+    const cacheKey = `sprints:id:${id}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any>(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    }
+
     this.logger.log(`Fetching sprint detail for ID ${id}`);
     const sprint = await this.prisma.sprint.findUnique({
       where: { id },
@@ -81,7 +119,13 @@ export class SprintsService {
       throw new NotFoundException(`Sprint with ID ${id} not found`);
     }
 
-    return this.calculateSprintMetrics(sprint);
+    const result = this.calculateSprintMetrics(sprint);
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, result, 60);
+    }
+
+    return result;
   }
 
   async update(id: string, dto: UpdateSprintDto) {
@@ -108,6 +152,7 @@ export class SprintsService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Sprint updated successfully: ID ${id}`);
     return updated;
   }
@@ -116,6 +161,8 @@ export class SprintsService {
     this.logger.log(`Deleting sprint ID ${id}`);
     await this.findOne(id);
     await this.prisma.sprint.delete({ where: { id } });
+
+    await this.invalidateCaches();
     this.logger.log(`Sprint deleted successfully: ID ${id}`);
     return { success: true, message: `Sprint ${id} deleted` };
   }
@@ -138,6 +185,7 @@ export class SprintsService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Task ${taskId} assigned to sprint ${sprintId}`);
     return updatedTask;
   }
@@ -154,6 +202,7 @@ export class SprintsService {
       data: { sprintId: null },
     });
 
+    await this.invalidateCaches();
     return updated;
   }
 

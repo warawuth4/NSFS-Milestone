@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { CreateMilestoneDto } from './dto/create-milestone.dto';
 import { UpdateMilestoneDto } from './dto/update-milestone.dto';
 
@@ -7,7 +8,10 @@ import { UpdateMilestoneDto } from './dto/update-milestone.dto';
 export class MilestonesService {
   private readonly logger = new Logger(MilestonesService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
 
   async create(dto: CreateMilestoneDto) {
     this.logger.log(`Creating milestone: ${dto.title}`);
@@ -23,12 +27,26 @@ export class MilestonesService {
         epics: true,
       },
     });
+
+    if (this.redis) {
+      await this.redis.delByPattern('milestones:*');
+    }
+
     this.logger.log(`Milestone created successfully: ID ${milestone.id}`);
     return milestone;
   }
 
   async findAll() {
-    this.logger.log('Fetching all milestones with sprints and epics progress');
+    const cacheKey = 'milestones:all';
+    if (this.redis) {
+      const cached = await this.redis.get<any[]>(cacheKey);
+      if (cached) {
+        this.logger.log('Returning milestones from Redis cache');
+        return cached;
+      }
+    }
+
+    this.logger.log('Fetching all milestones with sprints and epics progress from database');
     const milestones = await this.prisma.milestone.findMany({
       include: {
         sprints: {
@@ -53,10 +71,25 @@ export class MilestonesService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return milestones.map((milestone) => this.calculateMilestoneProgress(milestone));
+    const result = milestones.map((milestone) => this.calculateMilestoneProgress(milestone));
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, result, 60);
+    }
+
+    return result;
   }
 
   async findOne(id: string) {
+    const cacheKey = `milestones:${id}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any>(cacheKey);
+      if (cached) {
+        this.logger.log(`Returning milestone ${id} from Redis cache`);
+        return cached;
+      }
+    }
+
     this.logger.log(`Fetching milestone detail for ID ${id}`);
     const milestone = await this.prisma.milestone.findUnique({
       where: { id },
@@ -94,7 +127,13 @@ export class MilestonesService {
       throw new NotFoundException(`Milestone with ID ${id} not found`);
     }
 
-    return this.calculateMilestoneProgress(milestone);
+    const result = this.calculateMilestoneProgress(milestone);
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, result, 60);
+    }
+
+    return result;
   }
 
   async update(id: string, dto: UpdateMilestoneDto) {
@@ -117,6 +156,10 @@ export class MilestonesService {
       },
     });
 
+    if (this.redis) {
+      await this.redis.delByPattern('milestones:*');
+    }
+
     this.logger.log(`Milestone updated successfully: ID ${id}`);
     return updated;
   }
@@ -125,6 +168,11 @@ export class MilestonesService {
     this.logger.log(`Deleting milestone ID ${id}`);
     await this.findOne(id);
     await this.prisma.milestone.delete({ where: { id } });
+
+    if (this.redis) {
+      await this.redis.delByPattern('milestones:*');
+    }
+
     this.logger.log(`Milestone deleted successfully: ID ${id}`);
     return { success: true, message: `Milestone ${id} deleted` };
   }

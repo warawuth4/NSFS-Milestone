@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { CreateStoryDto } from './dto/create-story.dto';
 import { UpdateStoryDto } from './dto/update-story.dto';
 import { Status } from '@prisma/client';
@@ -8,7 +9,20 @@ import { Status } from '@prisma/client';
 export class StoriesService {
   private readonly logger = new Logger(StoriesService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
+
+  private async invalidateCaches() {
+    if (this.redis) {
+      await Promise.all([
+        this.redis.delByPattern('stories:*'),
+        this.redis.delByPattern('epics:*'),
+        this.redis.delByPattern('milestones:*'),
+      ]);
+    }
+  }
 
   async create(dto: CreateStoryDto) {
     this.logger.log(`Creating story: ${dto.title}`);
@@ -30,13 +44,23 @@ export class StoriesService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Story created successfully: ID ${story.id}`);
     return story;
   }
 
   async findAll(epicId?: string) {
+    const cacheKey = `stories:${epicId ?? 'all'}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any[]>(cacheKey);
+      if (cached) {
+        this.logger.log(`Returning stories from Redis cache (${cacheKey})`);
+        return cached;
+      }
+    }
+
     this.logger.log(`Finding stories (epicId: ${epicId ?? 'all'})`);
-    return this.prisma.story.findMany({
+    const stories = await this.prisma.story.findMany({
       where: {
         ...(epicId && { epicId }),
       },
@@ -52,9 +76,23 @@ export class StoriesService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, stories, 60);
+    }
+
+    return stories;
   }
 
   async findOne(id: string) {
+    const cacheKey = `stories:id:${id}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any>(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    }
+
     this.logger.log(`Fetching story ID ${id}`);
     const story = await this.prisma.story.findUnique({
       where: { id },
@@ -77,6 +115,10 @@ export class StoriesService {
     if (!story) {
       this.logger.warn(`Story not found: ID ${id}`);
       throw new NotFoundException(`Story with ID ${id} not found`);
+    }
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, story, 60);
     }
 
     return story;
@@ -107,6 +149,7 @@ export class StoriesService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Story updated successfully: ID ${id}`);
     return updated;
   }
@@ -115,6 +158,8 @@ export class StoriesService {
     this.logger.log(`Deleting story ID ${id}`);
     await this.findOne(id);
     await this.prisma.story.delete({ where: { id } });
+
+    await this.invalidateCaches();
     this.logger.log(`Story deleted successfully: ID ${id}`);
     return { success: true, message: `Story ${id} deleted` };
   }

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { RedisModule } from './redis/redis.module';
 import { HealthModule } from './health/health.module';
 import { MilestonesModule } from './milestones/milestones.module';
 import { SprintsModule } from './sprints/sprints.module';
@@ -13,6 +14,7 @@ import { AcceptanceCriteriaModule } from './acceptance-criteria/acceptance-crite
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    RedisModule,
     HealthModule,
     MilestonesModule,
     SprintsModule,

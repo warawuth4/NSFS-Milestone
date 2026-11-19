@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { CreateEpicDto } from './dto/create-epic.dto';
 import { UpdateEpicDto } from './dto/update-epic.dto';
 import { Status } from '@prisma/client';
@@ -8,7 +9,19 @@ import { Status } from '@prisma/client';
 export class EpicsService {
   private readonly logger = new Logger(EpicsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
+
+  private async invalidateCaches() {
+    if (this.redis) {
+      await Promise.all([
+        this.redis.delByPattern('epics:*'),
+        this.redis.delByPattern('milestones:*'),
+      ]);
+    }
+  }
 
   async create(dto: CreateEpicDto) {
     this.logger.log(`Creating epic: ${dto.title}`);
@@ -30,13 +43,23 @@ export class EpicsService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Epic created successfully: ID ${epic.id}`);
     return epic;
   }
 
   async findAll(milestoneId?: string) {
+    const cacheKey = `epics:${milestoneId ?? 'all'}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any[]>(cacheKey);
+      if (cached) {
+        this.logger.log(`Returning epics from Redis cache (${cacheKey})`);
+        return cached;
+      }
+    }
+
     this.logger.log(`Finding epics (milestoneId: ${milestoneId ?? 'all'})`);
-    return this.prisma.epic.findMany({
+    const epics = await this.prisma.epic.findMany({
       where: {
         ...(milestoneId && { milestoneId }),
       },
@@ -52,9 +75,23 @@ export class EpicsService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, epics, 60);
+    }
+
+    return epics;
   }
 
   async findOne(id: string) {
+    const cacheKey = `epics:id:${id}`;
+    if (this.redis) {
+      const cached = await this.redis.get<any>(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    }
+
     this.logger.log(`Fetching epic ID ${id}`);
     const epic = await this.prisma.epic.findUnique({
       where: { id },
@@ -78,6 +115,10 @@ export class EpicsService {
     if (!epic) {
       this.logger.warn(`Epic not found: ID ${id}`);
       throw new NotFoundException(`Epic with ID ${id} not found`);
+    }
+
+    if (this.redis) {
+      await this.redis.set(cacheKey, epic, 60);
     }
 
     return epic;
@@ -106,6 +147,7 @@ export class EpicsService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Epic updated successfully: ID ${id}`);
     return updated;
   }
@@ -114,6 +156,8 @@ export class EpicsService {
     this.logger.log(`Deleting epic ID ${id}`);
     await this.findOne(id);
     await this.prisma.epic.delete({ where: { id } });
+
+    await this.invalidateCaches();
     this.logger.log(`Epic deleted successfully: ID ${id}`);
     return { success: true, message: `Epic ${id} deleted` };
   }

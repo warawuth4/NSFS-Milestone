@@ -28,6 +28,7 @@ frontend/dist/
 build/
 .next/
 out/
+*.tsbuildinfo
 
 # Coverage directory used by tools like istanbul and jest
 coverage/

@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { CreateAcceptanceCriterionDto } from './dto/create-acceptance-criterion.dto';
 import { UpdateAcceptanceCriterionDto } from './dto/update-acceptance-criterion.dto';
 
@@ -7,7 +8,21 @@ import { UpdateAcceptanceCriterionDto } from './dto/update-acceptance-criterion.
 export class AcceptanceCriteriaService {
   private readonly logger = new Logger(AcceptanceCriteriaService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis?: RedisService,
+  ) {}
+
+  private async invalidateCaches() {
+    if (this.redis) {
+      await Promise.all([
+        this.redis.delByPattern('tasks:*'),
+        this.redis.delByPattern('stories:*'),
+        this.redis.delByPattern('epics:*'),
+        this.redis.delByPattern('milestones:*'),
+      ]);
+    }
+  }
 
   async create(dto: CreateAcceptanceCriterionDto) {
     this.logger.log(`Creating acceptance criterion: Given "${dto.given}" When "${dto.when}" Then "${dto.then}"`);
@@ -28,6 +43,7 @@ export class AcceptanceCriteriaService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Acceptance criterion created: ID ${criterion.id}`);
     return criterion;
   }
@@ -85,6 +101,7 @@ export class AcceptanceCriteriaService {
       },
     });
 
+    await this.invalidateCaches();
     this.logger.log(`Acceptance criterion updated: ID ${id}`);
     return updated;
   }
@@ -96,6 +113,8 @@ export class AcceptanceCriteriaService {
       where: { id },
       data: { isMet: !existing.isMet },
     });
+
+    await this.invalidateCaches();
     this.logger.log(`Acceptance criterion ${id} toggled to isMet=${updated.isMet}`);
     return updated;
   }
@@ -104,6 +123,8 @@ export class AcceptanceCriteriaService {
     this.logger.log(`Deleting acceptance criterion ID ${id}`);
     await this.findOne(id);
     await this.prisma.acceptanceCriterion.delete({ where: { id } });
+
+    await this.invalidateCaches();
     this.logger.log(`Acceptance criterion deleted: ID ${id}`);
     return { success: true, message: `Acceptance criterion ${id} deleted` };
   }
